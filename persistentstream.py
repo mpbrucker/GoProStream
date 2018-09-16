@@ -7,10 +7,11 @@ import argparse
 import signal
 import logging
 import socket
+import sys
 
 parser = argparse.ArgumentParser(description="UDP video streaming options.")
 parser.add_argument("--ip", help="The IP address of the GoPro", default="10.5.5.9")
-parser.add_argument("--port", help="The UDP port of the GoPro stream", default="8554")
+parser.add_argument("--port", help="The UDP port of the GoPro stream", default=8554)
 parser.add_argument("--stream-ip", help="The IP address of the GoPro stream", default="10.5.5.100")
 parser.add_argument("--record", help="Record the stream to the GoPro.", action="store_true")
 
@@ -54,16 +55,17 @@ def pull_stream():
     """
     Pulls in the UDP stream from the GoPro.
     """
-    subprocess.Popen(f"ffplay -fflags nobuffer -fs -f:v mpegts -probesize 8192 udp://{GOPRO_IP}:{PORT}", shell=True)
+    proc1 = subprocess.Popen(f"ffplay -loglevel panic -fflags nobuffer -fs -f:v mpegts -probesize 8192 udp://{GOPRO_IP}:{PORT}", shell=True)
     while True:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.sendto(MESSAGE, (GOPRO_IP, PORT))
         time.sleep(KEEP_ALIVE_PERIOD)
 
 def quit_gopro(signal, frame):
-	if RECORD:
-		requests.get(f"http://{GOPRO_IP}/gp/gpControl/command/shutter", params={"p": "0"})
-	sys.exit(0)
+    print("Quitting stream.")
+    if RECORD:
+        requests.get(f"http://{GOPRO_IP}/gp/gpControl/command/shutter", params={"p": "0"})
+    sys.exit(0)
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, quit_gopro)
