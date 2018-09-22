@@ -92,7 +92,7 @@ def gopro_live():
 		if VERBOSE==False:
 			loglevel_verbose = "-loglevel panic"
 		if SAVE == False:
-			subprocess.Popen("ffplay " + loglevel_verbose + " -fflags nobuffer -fs -f:v mpegts -probesize 8192 udp://10.5.5.100:8554", shell=True)
+			subprocess.Popen("ffplay " + loglevel_verbose + " -fflags nobuffer -f:v mpegts -probesize 8192 udp://10.5.5.100:8554", shell=True)
 		else:
 			if SAVE_FORMAT=="ts":
 				TS_PARAMS = " -acodec copy -vcodec copy "
@@ -104,11 +104,13 @@ def gopro_live():
 			print("Note: Preview is not available when saving the stream.")
 			subprocess.Popen("ffmpeg -i 'udp://:10.5.5.100:8554' -fflags nobuffer -f:v mpegts -probesize 8192 " + TS_PARAMS + SAVELOCATION, shell=True)
 		if sys.version_info.major >= 3:
+			print("Message stuff")
 			MESSAGE = bytes(MESSAGE, "utf-8")
 		print("Press ctrl+C to quit this application.\n")
 		while True:
 			sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 			sock.sendto(MESSAGE, (UDP_IP, UDP_PORT))
+			print(KEEP_ALIVE_PERIOD/1000)
 			sleep(KEEP_ALIVE_PERIOD/1000)
 	else:
 		print("branch hero3"+response)

@@ -20,7 +20,7 @@ print(args)
 
 
 # Keep alive message
-MESSAGE = bytes("GPHD:0:0:2:0.000000\n", "utf-8")
+MESSAGE = bytes("_GPHD_:0:0:2:0.000000\n", "utf-8")
 KEEP_ALIVE_PERIOD = 2.5
 
 GOPRO_IP = args.ip
@@ -56,6 +56,8 @@ def pull_stream():
     Pulls in the UDP stream from the GoPro.
     """
     proc1 = subprocess.Popen(f"ffplay -loglevel panic -fflags nobuffer -fs -f:v mpegts -probesize 8192 udp://{GOPRO_IP}:{PORT}", shell=True)
+    logging.info("Began streaming.")
+    # proc1 = subprocess.Popen(f"ffplay -fflags nobuffer -f:v mpegts -probesize 8192 udp://{GOPRO_IP}:{PORT}", shell=True)
     while True:
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.sendto(MESSAGE, (GOPRO_IP, PORT))
